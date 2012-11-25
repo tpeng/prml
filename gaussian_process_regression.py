@@ -1,20 +1,67 @@
-from __future__ import division
+#
+# simple regression with Gaussian Process
+# tpeng <pengtaoo@gmail.com>
+# 2012/11/25
+#
+import pylab as pl
 import numpy as np
+import scipy.sparse.linalg
 
-x = [-1.5, -1.0, -0.75, -0.40, -0.25, 0.00]
+# the Gaussian kernel
+def rbf(x1, x2, _lambda=1.0):
+  d = (x1-x2)**2 / _lambda
+  return np.exp(-0.5*d)
 
-class RBF():
-  def __init__(self, Lambda):
-    self._lambda = Lambda
+class GP():
+  def __init__(self, kn, beta=1.0):
+    self.kn = kn
+    self.beta = beta
 
-  def compute(self, x, x2):
-    X = np.matrix(x)
-    X2 = np.matrix(x2)
-    sq_norm = np.dot(X.T, X) + np.dot(X2.T, X) - 2*X*X2.T
-    return np.exp(-sq_norm / self._lambda**2)
+  # compute the Gram matrix of k(x1, xn)
+  def _K(self, x1, x2):
+    # x1 and x2 have same dimension
+    N = x1.shape[0]
+    M = x2.shape[0]
+    K = np.zeros((N,M), float)
+    for i in range(0, N):
+      for j in range(0, M):
+        K[i, j] = self.kn(x1[i], x2[j])
+    return K
+
+  def fit(self, x, y):
+    self._x = x
+    K = self._K(x, x)
+    # plus the noise
+    K = K + self.beta * np.identity(len(K))
+    L = scipy.sparse.linalg.splu(K)
+    self.alpha = L.solve(y)
+
+  def predict(self, x):
+    ks = self._K(x, self._x)
+    return ks.dot(self.alpha)
 
 if __name__ == '__main__':
-  rbf = RBF(1)
-  X = np.matrix(x)
-  print np.dot(X, X.T)
-#  print rbf.compute(x,x)
+  np.random.seed(5)
+
+  # 100 data point
+  N = 500
+  s = 10
+
+  x = s * np.random.rand(N)
+  y = np.sin(x) + 0.1*np.random.randn(N)
+
+  # plot the raw data (sin + noise)
+  pl.plot(x,y,'.r')
+
+  # do the regression
+  gp = GP(rbf)
+  gp.fit(x, y)
+
+  x0 = np.linspace(min(x),max(x),500)
+  mean = gp.predict(x0)
+
+  pl.plot(x0, mean)
+
+  # show the prediction
+  pl.show()
+
