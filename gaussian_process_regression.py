@@ -5,7 +5,6 @@
 #
 import pylab as pl
 import numpy as np
-import scipy.sparse.linalg
 
 # the Gaussian kernel
 def rbf(x1, x2, _lambda=1.0):
@@ -33,8 +32,7 @@ class GP():
     K = self._K(x, x)
     # plus the noise
     K = K + self.beta * np.identity(len(K))
-    L = scipy.sparse.linalg.splu(K)
-    self.alpha = L.solve(y)
+    self.alpha = np.linalg.solve(K, y)
 
   def predict(self, x):
     ks = self._K(x, self._x)
@@ -44,7 +42,7 @@ if __name__ == '__main__':
   np.random.seed(5)
 
   # 100 data point
-  N = 500
+  N = 1000
   s = 10
 
   x = s * np.random.rand(N)
