@@ -5,15 +5,18 @@ import pylab as pl
 def identity(x):
   return x
 
+def numpy_identity(x):
+  return np.frompyfunc(identity, 1, 1)
+
 class Regression():
   def __init__(self):
     pass
 
   def fit(self, x, y):
-    x0 = np.array(map(identity, x), float)
-    theta = x0.T
+    numpy_identity(x)
+    theta = x.T
     self.w = np.dot(1 / np.dot(theta.T, theta) * theta.T, y)
-    self.w0 = np.mean(y) - np.sum(map(identity, x[1:])) / (len(x) - 1)
+    self.w0 = np.mean(y) - np.mean(np.dot(self.w, x))
 
   def predict(self, x):
     pred = map(lambda x : self.w0 + identity(x), x)
