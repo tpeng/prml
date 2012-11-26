@@ -1,51 +1,27 @@
+# linear model for regression in PRML chapter 03
+# tpeng <pengtaoo@gmail.com>
+# 2012/11/26
 import numpy as np
-import pylab as pl
-
-# the simplest basis function
-def identity(x):
-  return x
-
-def numpy_identity(x):
-  return np.frompyfunc(identity, 1, 1)
+from fns import apply_fns
 
 class Regression():
-  def __init__(self):
-    pass
+  def __init__(self, _lambda, fns):
+    self._lambda = _lambda
+    self._fns = fns
 
   def fit(self, x, y):
-    numpy_identity(x)
-    theta = x.T
-    self.w = np.dot(1 / np.dot(theta.T, theta) * theta.T, y)
-    self.w0 = np.mean(y) - np.mean(np.dot(self.w, x))
+    x0 = apply_fns(self._fns, x)
+    S = np.dot(x0.T, x0)
+    if S.size == 1:
+      S += self._lambda
+    else:
+      S += self._lambda * np.identity(len(S))
+    self.w = np.linalg.solve(S, np.dot(x0.T, y))
+    self.w0 = np.mean(y) - np.dot(self.w, np.mean(x0, axis=0))
 
-  def predict(self, x):
-    pred = map(lambda x : self.w0 + identity(x), x)
-    return np.array(pred)
+    print self.w
 
-if __name__ == '__main__':
-  np.random.seed(5)
-
-  # 100 data point
-  N = 100
-  s = 10
-
-  # the data to learn
-  x = s * np.random.rand(N)
-  w = np.random.rand()
-  y = w * x + 0.5 * np.random.randn(N)
-
-  # plot the raw data (sin + noise)
-  pl.plot(x,y,'.r')
-
-  # predict with regression
-  x0 = np.linspace(min(x),max(x),500)
-
-  m = Regression()
-  m.fit(x, y)
-
-  y0 = m.predict(x0)
-
-  pl.plot(x0, y0)
-  pl.show()
-
-
+  def predict(self, x, fns):
+    x0 = apply_fns(fns, x)
+    v = np.dot(x0, self.w)
+    return v + self.w0
