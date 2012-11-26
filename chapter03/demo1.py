@@ -1,7 +1,7 @@
 import numpy as np
 import pylab as pl
 from chapter03.linear_regression import Regression
-from fns import logistic, identity
+from fns import  identity
 
 if __name__ == '__main__':
   np.random.seed(7)
@@ -21,10 +21,10 @@ if __name__ == '__main__':
   # predict with regression
   x0 = np.linspace(min(x),max(x),500)
 
-  m = Regression(0.5, basis_fn=identity)
+  m = Regression(0.5, [identity])
   m.fit(x, y)
 
-  y0 = m.predict(x0)
+  y0 = m.predict(x0, [identity])
 
   pl.plot(x0, y0)
   pl.show()
