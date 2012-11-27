@@ -1,17 +1,17 @@
+# use linear model to fit sin(x) + noise
 import numpy as np
 import pylab as pl
 from chapter03.linear_regression import Regression
 
-def poly_fns(M):
-  for i in xrange(1, M+1):
-    yield lambda x:x**i
+# simple basis functions
+fns = [lambda j, x : x, lambda j, x : x**2, lambda j, x: x**3, lambda j, x: x**4]
 
 if __name__ == '__main__':
   np.random.seed(7)
 
   # 100 data point
   N = 100
-  M = 5
+  M = len(fns)
   s = 10
 
   # the data to learn
@@ -25,10 +25,10 @@ if __name__ == '__main__':
   # predict with regression
   x0 = np.linspace(min(x),max(x),500)
 
-  m = Regression(0.5, poly_fns(M))
+  m = Regression(0.5, N, M, fns)
   m.fit(x, y)
 
-  y0 = m.predict(x0, poly_fns(M))
+  y0 = m.predict(x0)
 
   pl.plot(x0, y0)
   pl.show()

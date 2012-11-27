@@ -5,23 +5,29 @@ import numpy as np
 from fns import apply_fns
 
 class Regression():
-  def __init__(self, _lambda, fns):
+  def __init__(self, _lambda, N, M, fns):
     self._lambda = _lambda
+    self._N = N
+    self._M = M
     self._fns = fns
 
   def fit(self, x, y):
-    x0 = apply_fns(self._fns, x)
+    x0 = np.zeros((self._N, self._M), float)
+    for i in range(self._N):
+      for j in range(self._M):
+        x0[i,j] = self._fns[j](j, x[i])
     S = np.dot(x0.T, x0)
     if S.size == 1:
       S += self._lambda
     else:
       S += self._lambda * np.identity(len(S))
     self.w = np.linalg.solve(S, np.dot(x0.T, y))
-    self.w0 = np.mean(y) - np.dot(self.w, np.mean(x0, axis=0))
+    self.b = np.mean(y) - np.dot(self.w.T, np.mean(x0, axis=0))
 
-    print self.w
-
-  def predict(self, x, fns):
-    x0 = apply_fns(fns, x)
+  def predict(self, xs):
+    x0 = np.zeros((len(xs), self._M), float)
+    for i in range(len(xs)):
+      for j in range(self._M):
+        x0[i,j] = self._fns[j](j, xs[i])
     v = np.dot(x0, self.w)
-    return v + self.w0
+    return v + self.b

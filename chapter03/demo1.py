@@ -1,13 +1,14 @@
 import numpy as np
 import pylab as pl
 from chapter03.linear_regression import Regression
-from fns import  identity
+from fns import identity
 
 if __name__ == '__main__':
   np.random.seed(7)
 
   # 100 data point
   N = 100
+  M = 1
   s = 10
 
   # the data to learn
@@ -21,10 +22,13 @@ if __name__ == '__main__':
   # predict with regression
   x0 = np.linspace(min(x),max(x),500)
 
-  m = Regression(0.5, [identity])
+  # simple basis functions
+  fns = [lambda j, x : x] * M
+
+  m = Regression(0.5, N, M, fns)
   m.fit(x, y)
 
-  y0 = m.predict(x0, [identity])
+  y0 = m.predict(x0)
 
   pl.plot(x0, y0)
   pl.show()
