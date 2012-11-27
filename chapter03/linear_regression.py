@@ -2,7 +2,6 @@
 # tpeng <pengtaoo@gmail.com>
 # 2012/11/26
 import numpy as np
-from fns import apply_fns
 
 class Regression():
   def __init__(self, _lambda, N, M, fns):

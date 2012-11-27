@@ -1,7 +1,6 @@
 import numpy as np
 import pylab as pl
 from chapter03.linear_regression import Regression
-from fns import identity
 
 if __name__ == '__main__':
   np.random.seed(7)
