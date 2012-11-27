@@ -22,10 +22,10 @@ def main():
 
   print "vector of max weights", w
 
-#  plt.plot(np.dot(class1, w), [0]*class1.shape[0], 'bx', label='iris-setosa')
-#  plt.plot(np.dot(class2, w), [0]*class2.shape[0], 'go', label='iris-versicolor and iris-virginica')
-#  plt.legend()
-#  plt.show()
+  plt.plot(np.dot(class1, w), [0]*class1.shape[0], 'bx', label='iris-setosa')
+  plt.plot(np.dot(class2, w), [0]*class2.shape[0], 'go', label='iris-versicolor and iris-virginica')
+  plt.legend()
+  plt.show()
 
 if __name__ == '__main__':
   main()
