@@ -1,9 +1,9 @@
-from __future__ import division
+# Probabilistic Generative Model (PRML 4.2)
 import numpy as np
 import math
 
 def read_data():
-  f = open('dataset\\bezdekIris.data', 'r')
+  f = open('..\\dataset\\bezdekIris.data', 'r')
   lines = [line.strip() for line in f.readlines()]
   f.close()
 
