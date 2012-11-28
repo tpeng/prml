@@ -32,7 +32,6 @@ def read_data():
 
   return class1, class2
 
-
 class1, class2 = read_data()
 # plot the raw data
 figure(0)
@@ -40,6 +39,10 @@ pl.plot(class1[:,0], class1[:,1], 'xr')
 pl.plot(class2[:,0], class2[:,1], 'ob')
 
 figure(1)
-classifier = FisherClassifier(class1, class2)
-classifier.train()
-classifier.plot()
+
+m = FisherClassifier(class1, class2)
+m.fit()
+
+pl.plot(np.dot(class1, m.w), [0]*class1.shape[0], 'bo')
+pl.plot(np.dot(class2, m.w), [0]*class2.shape[0], 'r-')
+pl.show()

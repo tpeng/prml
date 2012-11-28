@@ -3,6 +3,7 @@ import re
 from matplotlib.pyplot import figure
 import numpy as np
 import pylab as pl
+from chapter04.fisher_classifier import FisherClassifier
 
 def read_data():
   f = open('..\dataset\\haberman.data', 'r')
@@ -31,18 +32,14 @@ def read_data():
 
 class1, class2 = read_data()
 
-mean1 = np.mean(class1, axis=0)
-mean2 = np.mean(class2, axis=0)
-
-sw = np.dot((class1 - mean1).T, class1 -mean1) + np.dot((class2 - mean2).T, class2-mean2)
-w = np.dot(np.linalg.inv(sw), mean2 - mean1)
-
-print "vector of max weights", w
+class1, class2 = read_data()
+m = FisherClassifier(class1, class2)
+m.fit()
 
 # plot the boundary
 figure(1)
-pl.plot(np.dot(class1, w), [0]*class1.shape[0], 'bo')
-pl.plot(np.dot(class2, w), [0]*class2.shape[0], 'rx')
+pl.plot(np.dot(class1, m.w), [0]*class1.shape[0], 'bo')
+pl.plot(np.dot(class2, m.w), [0]*class2.shape[0], 'rx')
 
 pl.show()
 
