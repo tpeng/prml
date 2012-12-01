@@ -6,6 +6,7 @@
 import random
 import re
 import numpy as np
+import pylab as pl
 
 def linearkernel(x1, x2):
   return np.dot(x1, x2)
@@ -16,16 +17,12 @@ def rbfkernel(x1, x2, _lambda=0.5):
     s += (x1[i] - x2[i])**2
   return np.exp(-s/(2*_lambda*_lambda))
 
-#  d = (np.array(x1, float) - np.array(x2, float)) ** 2  / _lambda
-#  print d
-#  return np.exp(-0.5*d)
-
 class SMO():
   def __init__(self, data, labels):
     self.C = 1.0
     self.tol = 1e-4
-    self.maxiter = 10000
-    self.kernel = rbfkernel
+    self.maxiter = 1000
+    self.kernel = linearkernel
     self.numpasses = 10
     self.alpha = np.array([0] * len(data))
     self.b = 0.0
@@ -38,7 +35,7 @@ class SMO():
     N = len(self.alpha)
 
     while passes < self.numpasses and iter < self.maxiter:
-      alpha_changed = False
+      alpha_changed = 0
 
       for i in range(N):
         Ei = self.margin_one(self.data[i]) - self.labels[i]
@@ -54,9 +51,6 @@ class SMO():
           ai = self.alpha[i]
           aj = self.alpha[j]
 
-          L = 0
-          H = self.C
-
           if self.labels[i] == self.labels[j]:
             L = max(0, ai+aj-self.C)
             H = min(self.C, ai+aj)
@@ -70,7 +64,6 @@ class SMO():
           eta = 2*self.kernel(self.data[i], self.data[j]) - \
                 self.kernel(self.data[i], self.data[i]) - \
                 self.kernel(self.data[j], self.data[j])
-
           if eta >= 0:
             continue
 
@@ -84,17 +77,17 @@ class SMO():
             continue
           self.alpha[j] = newaj
 
-          newai= ai + self.labels[i] * self.labels[j] * (aj -newaj)
+          newai = ai + self.labels[i] * self.labels[j] * (aj -newaj)
           self.alpha[i] = newai
 
           # update bias
           b1 = self.b - Ei - self.labels[i]*(newai-ai)*self.kernel(self.data[i], self.data[i]) - \
-               self.labels[j] * (newaj-aj)*self.kernel(self.data[j], self.data[j])
+               self.labels[j] * (newaj-aj)*self.kernel(self.data[i], self.data[j])
 
           b2 = self.b - Ej - self.labels[i]*(newai-ai)*self.kernel(self.data[i],self.data[j]) - \
                self.labels[j]*(newaj-aj)*self.kernel(self.data[j],self.data[j])
 
-          b = (b1+b2)/ 2
+          self.b = (b1+b2)/ 2
 
           if 0 < newai < self.C:
             self.b = b1
@@ -114,19 +107,21 @@ class SMO():
   # end  while
 
   def margin_one(self, xs):
-    y = self.b
+    f = self.b
     for i in range(len(self.data)):
-      y += self.labels[i] * self.kernel(xs, self.data[i])
-    return y
+      f += self.alpha[i]*self.labels[i] * self.kernel(xs, self.data[i])
+    return f
 
   def predict(self, xs):
-    if self.margin_one(xs) > 0:
+    if self.margin_one(xs) >= 0:
       return 1
     else:
       return -1
 
-def read_data(N=110):
+def read_data(N=100):
+#  f = open('..\dataset\\mla\\testSet.txt', 'r')
   f = open('..\dataset\\classification.txt', 'r')
+#
   lines = map(lambda x: x.strip(), f.readlines())
   random.shuffle(lines)
   f.close()
@@ -164,8 +159,20 @@ def read_data(N=110):
 
 if __name__ == '__main__':
   data, labels, tests, test_labels = read_data()
+
+  c1 = np.array([data[i] for i, a in enumerate(labels) if a == 1])
+  c2 = np.array([data[i] for i, a in enumerate(labels) if a == -1])
+
+  pl.plot(c1[:,0], c1[:,1], 'xr')
+  pl.plot(c2[:,0], c2[:,1], 'ob')
+
   smo = SMO(data, labels)
   smo.train()
+
+  # plot the support vectors
+  support_vectors = np.array([data[i] for i, a in enumerate(smo.alpha) if a > 0])
+  pl.plot(support_vectors[:,0], support_vectors[:,1], 'oc', markersize=15)
+  pl.show()
 
   errors = 0
   # predict
