@@ -3,19 +3,25 @@
 # tpeng <pengtaoo@gmail.com>
 # 2012/11/30
 #
+from math import exp
 import random
 import re
 import numpy as np
 import pylab as pl
 
 def linearkernel(x1, x2):
-  return np.dot(x1, x2)
+  s = 0
+  for i in range(len(x1)):
+    s += x1[i] * x2[i]
+  return s
+# TODO: check why np.dot is slow in this case
+#  return np.dot(x1, x2)
 
 def rbfkernel(x1, x2, _lambda=0.5):
   s = 0
   for i in range(len(x1)):
     s += (x1[i] - x2[i])**2
-  return np.exp(-s/(2*_lambda*_lambda))
+  return exp(-s/(2*_lambda*_lambda))
 
 class SMO():
   def __init__(self, data, labels):
@@ -24,7 +30,7 @@ class SMO():
     self.maxiter = 1000
     self.kernel = linearkernel
     self.numpasses = 10
-    self.alpha = np.array([0] * len(data))
+    self.alpha = [0] * len(data)
     self.b = 0.0
     self.data = data
     self.labels = labels
@@ -174,6 +180,7 @@ if __name__ == '__main__':
   pl.plot(support_vectors[:,0], support_vectors[:,1], 'oc', markersize=15)
   pl.show()
 
+  print '# support vectors', len(support_vectors)
   errors = 0
   # predict
   for i, t in enumerate(tests):
