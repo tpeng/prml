@@ -50,10 +50,12 @@ class Kmeans():
             if abs(J-prev_J) < tol:
                 converged=True
             else:
+                print J
                 prev_J = J
 
         print 'converged. '
         self.centroids = uk
+        self.rnk = rnk
 
 def read_data(name):
     xs = []
