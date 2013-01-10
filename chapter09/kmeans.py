@@ -1,3 +1,6 @@
+# kmeans implementation in PRML chapter 09
+# tpeng <pengtaoo@gmail.com>
+# 2013/1/10
 import numpy as np
 import pylab as plt
 
@@ -50,7 +53,7 @@ class Kmeans():
             if abs(J-prev_J) < tol:
                 converged=True
             else:
-                print J
+                print J,
                 prev_J = J
 
         print 'converged. '
