@@ -8,7 +8,7 @@ import numpy as np
 from chapter04.fisher_classifier import FisherClassifier
 
 def read_data():
-  f = open('..\dataset\\classification.txt', 'r')
+  f = open('../dataset/classification.txt', 'r')
   lines = map(lambda x: x.strip(), f.readlines())
   f.close()
 

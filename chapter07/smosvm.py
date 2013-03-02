@@ -126,7 +126,7 @@ class SMO():
 
 def read_data(N=100):
 #  f = open('..\dataset\\mla\\testSet.txt', 'r')
-  f = open('..\dataset\\classification.txt', 'r')
+  f = open('../dataset/classification.txt', 'r')
 #
   lines = map(lambda x: x.strip(), f.readlines())
   random.shuffle(lines)
